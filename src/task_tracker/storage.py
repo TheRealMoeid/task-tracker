@@ -45,7 +45,7 @@ def load_tasks(path: Path | str | None = None) -> list[dict]:
     from a clean slate. Raises StorageError when the file exists but cannot be
     read or does not contain a JSON list.
     """
-    target = Path(path) if path is not None else default_file_path()
+    target = _resolve(path)
 
     if not target.exists():
         return []
@@ -79,7 +79,7 @@ def save_tasks(tasks: list[dict], path: Path | str | None = None) -> None:
     Raises StorageError when the file cannot be written, for example because
     the directory is not writable.
     """
-    target = Path(path) if path is not None else default_file_path()
+    target = _resolve(path)
 
     try:
         target.write_text(
@@ -92,5 +92,13 @@ def save_tasks(tasks: list[dict], path: Path | str | None = None) -> None:
 
 def file_exists(path: Path | str | None = None) -> bool:
     """Return True when the task file already exists."""
-    target = Path(path) if path is not None else default_file_path()
-    return target.exists()
+    return _resolve(path).exists()
+
+
+def _resolve(path: Path | str | None) -> Path:
+    """Return path as a Path, defaulting to tasks.json in the current directory."""
+    if path is None:
+        return default_file_path()
+    if isinstance(path, Path):
+        return path
+    return Path(path)

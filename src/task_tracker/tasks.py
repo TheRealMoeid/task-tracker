@@ -27,17 +27,21 @@ def _require_task(tasks: list[dict], task_id: int) -> dict:
 def next_id(tasks: list[dict]) -> int:
     """Return the next free task id.
 
-    Ids are never reused, even after a task is deleted, so a deleted id can
-    never point at a different task later.
+    Ids are never reused, even after the highest task is deleted, so a freed
+    id can never point at a different task later. The candidate is bumped
+    until it does not collide with any id still in the list.
     """
-    highest = 0
+    existing: set[int] = set()
     for task in tasks:
         try:
-            candidate = int(task.get("id", 0))
+            existing.add(int(task.get("id", 0)))
         except (TypeError, ValueError):
             continue
-        highest = max(highest, candidate)
-    return highest + 1
+
+    candidate = max(existing, default=0) + 1
+    while candidate in existing:
+        candidate += 1
+    return candidate
 
 
 def add_task(
