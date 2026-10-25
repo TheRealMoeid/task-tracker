@@ -25,11 +25,13 @@ def _require_task(tasks: list[dict], task_id: int) -> dict:
 
 
 def next_id(tasks: list[dict]) -> int:
-    """Return the next free task id.
+    """Return the next task id.
 
-    Ids are never reused, even after the highest task is deleted, so a freed
-    id can never point at a different task later. The candidate is bumped
-    until it does not collide with any id still in the list.
+    The id is one more than the highest id currently in the list, so ids are
+    handed out in increasing order. A deleted id is reused once nothing
+    higher remains: with tasks 1 and 2 stored, deleting 2 and adding again
+    gives the new task id 2. Ids are only guaranteed to be unique among the
+    tasks that are currently in the file.
     """
     existing: set[int] = set()
     for task in tasks:
@@ -38,10 +40,7 @@ def next_id(tasks: list[dict]) -> int:
         except (TypeError, ValueError):
             continue
 
-    candidate = max(existing, default=0) + 1
-    while candidate in existing:
-        candidate += 1
-    return candidate
+    return max(existing, default=0) + 1
 
 
 def add_task(

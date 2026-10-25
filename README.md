@@ -81,5 +81,5 @@ All tests are self contained and do not touch the network or the real `tasks.jso
 ## Limitations
 
 - One flat list of tasks, no projects, tags, priorities, or due dates
+- Task ids are `max + 1`, so a deleted id is reused once no higher id remains
 - No pagination or search
-- Task IDs are not reused after a task is deleted

@@ -81,7 +81,7 @@ def test_delete_unknown_id_raises(tmp_path):
         tasks.delete_task(42, path=str(path))
 
 
-def test_ids_never_collide_with_existing_tasks(tmp_path):
+def test_deleted_highest_id_is_reused(tmp_path):
     path = tmp_path / "tasks.json"
     tasks.add_task("one", path=str(path))
     tasks.add_task("two", path=str(path))
@@ -89,6 +89,25 @@ def test_ids_never_collide_with_existing_tasks(tmp_path):
     next_task = tasks.add_task("three", path=str(path))
     assert next_task["id"] == 2
     assert len(tasks.list_tasks(path=str(path))) == 2
+
+
+def test_next_id_is_max_plus_one(tmp_path):
+    path = tmp_path / "tasks.json"
+    tasks.add_task("one", path=str(path))
+    tasks.add_task("two", path=str(path))
+    tasks.add_task("three", path=str(path))
+    tasks.delete_task(3, path=str(path))
+    assert tasks.add_task("four", path=str(path))["id"] == 3
+
+
+def test_next_id_skips_gaps(tmp_path):
+    path = tmp_path / "tasks.json"
+    tasks.add_task("one", path=str(path))
+    tasks.add_task("two", path=str(path))
+    tasks.add_task("three", path=str(path))
+    # A gap in the middle does not pull the next id down.
+    tasks.delete_task(2, path=str(path))
+    assert tasks.add_task("four", path=str(path))["id"] == 4
 
 
 def test_set_status_updates_status(tmp_path):
