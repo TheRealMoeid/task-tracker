@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from task_tracker.cli import EXIT_FAILURE, EXIT_OK, EXIT_USAGE
 
 
