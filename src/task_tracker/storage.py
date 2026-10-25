@@ -8,7 +8,6 @@ project.
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -19,9 +18,6 @@ STATUS_TODO = "todo"
 STATUS_IN_PROGRESS = "in-progress"
 STATUS_DONE = "done"
 VALID_STATUSES = (STATUS_TODO, STATUS_IN_PROGRESS, STATUS_DONE)
-
-#: The properties every task must have.
-REQUIRED_FIELDS = ("id", "description", "status", "createdAt", "updatedAt")
 
 
 class StorageError(Exception):
@@ -88,11 +84,6 @@ def save_tasks(tasks: list[dict], path: Path | str | None = None) -> None:
         )
     except OSError as exc:
         raise StorageError(f"Could not write {target}: {exc.strerror}") from exc
-
-
-def file_exists(path: Path | str | None = None) -> bool:
-    """Return True when the task file already exists."""
-    return _resolve(path).exists()
 
 
 def _resolve(path: Path | str | None) -> Path:

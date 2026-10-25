@@ -124,6 +124,37 @@ def test_mark_done(store):
     assert data[0]["status"] == "done"
 
 
+def test_mark_in_progress_without_id_exits_two(store):
+    store("add", "Buy groceries")
+    code, _, err, _ = store("mark-in-progress")
+    assert code == EXIT_USAGE
+    assert "Usage: task-cli mark-in-progress <id>" in err
+
+
+def test_mark_done_without_id_exits_two(store):
+    store("add", "Buy groceries")
+    code, _, err, _ = store("mark-done")
+    assert code == EXIT_USAGE
+    assert "Usage: task-cli mark-done <id>" in err
+
+
+def test_mark_usage_message_names_a_real_command(store):
+    """The usage message must name the command the user actually typed.
+
+    Regression test: cmd_mark used to receive the status instead of the command
+    name, so `mark-in-progress` printed 'Usage: task-cli in-progress <id>'.
+    """
+    for command in ("mark-in-progress", "mark-done"):
+        store("add", "Buy groceries")
+        code, out, err, _ = store(command)
+        assert code == EXIT_USAGE
+        assert out == ""
+        assert f"task-cli {command} <id>" in err
+        # The status alone must never appear as a command name.
+        assert "task-cli in-progress <id>" not in err
+        assert "task-cli done <id>" not in err
+
+
 def test_mark_unknown_id_exits_one(store):
     store("add", "Buy groceries")
     code, _, err, _ = store("mark-done", "99")

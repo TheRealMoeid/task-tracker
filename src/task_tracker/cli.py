@@ -109,10 +109,10 @@ def cmd_delete(arguments: list[str]) -> int:
     return EXIT_OK
 
 
-def cmd_mark(arguments: list[str], status: str) -> int:
+def cmd_mark(arguments: list[str], command: str, status: str) -> int:
     """Handle `mark-in-progress <id>` and `mark-done <id>`."""
     if len(arguments) != 1:
-        return _fail(f"Usage: task-cli {status} <id>", EXIT_USAGE)
+        return _fail(f"Usage: task-cli {command} <id>", EXIT_USAGE)
 
     task_id = _parse_id(arguments[0])
     if task_id is None:
@@ -182,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if command in ("mark-in-progress", "mark-done"):
         status = "in-progress" if command == "mark-in-progress" else "done"
-        return cmd_mark(rest, status)
+        return cmd_mark(rest, command, status)
 
     handler = COMMANDS.get(command)
     if handler is None:
